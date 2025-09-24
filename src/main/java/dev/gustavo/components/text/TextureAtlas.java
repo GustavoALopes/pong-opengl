@@ -6,8 +6,11 @@ import org.lwjgl.opengl.GL40;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -141,8 +144,8 @@ public class TextureAtlas {
             final float y0 = (y - height) / (float)fontHeight;
             final float y1 = (y)/(float)fontHeight;
 
-            textureCoords[0] = new Vector2f(x0, y1);
-            textureCoords[1] = new Vector2f(x1, y0);
+            textureCoords[0] = new Vector2f(x0, y1);//bottom-left
+            textureCoords[1] = new Vector2f(x1, y0);//top-right
         }
 
         public static Glyph create(

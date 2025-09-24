@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL40;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 public class TextProgram extends Program {
 
@@ -24,8 +25,9 @@ public class TextProgram extends Program {
     private TextIndexBuffer ebo;
 
     private TextProgram(
-        final long initialBufferSize,
-        final int indexBufferSize
+            final long initialBufferSize,
+            final int indexBufferSize,
+            final TextRender.CoordinateSystemEnum coordinateSystemEnum
     ) {
         super();
         this.vao = VertexArrayObject.create();
@@ -39,7 +41,11 @@ public class TextProgram extends Program {
 
         this.projection = new Matrix4f();
         this.projection.identity();
-        this.projection.ortho(0, Window.getWidth(), Window.getHeight(), 0f, 1f, 100f);
+        if(Objects.equals(coordinateSystemEnum, TextRender.CoordinateSystemEnum.TOP_LEFT)) {
+            this.projection.ortho(0, Window.getWidth(), Window.getHeight(), 0f, 1f, 100f);
+        } else {
+            this.projection.ortho(0, Window.getWidth(), 0f, Window.getHeight(), 1f, 100f);
+        }
     }
 
     public void uploadData(
@@ -79,12 +85,14 @@ public class TextProgram extends Program {
     }
 
     public static TextProgram create(
-        final long initialBufferSize,
-        final int indexBufferSize
+            final long initialBufferSize,
+            final int indexBufferSize,
+            final TextRender.CoordinateSystemEnum coordinateSystemEnum
     ) throws URISyntaxException {
         final var program = new TextProgram(
                 initialBufferSize,
-                indexBufferSize
+                indexBufferSize,
+                coordinateSystemEnum
         );
 
         program.addShader(Shader.create(

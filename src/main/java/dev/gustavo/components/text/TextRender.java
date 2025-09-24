@@ -21,11 +21,19 @@ public class TextRender {
 
     private int size = 0;
 
-    private TextRender(final TextureAtlas atlas) throws URISyntaxException {
+    private final CoordinateSystemEnum coordinateSystem;
+
+    private TextRender(
+            final TextureAtlas atlas,
+            final CoordinateSystemEnum coordinateSystem
+    ) throws URISyntaxException {
         this.atlas = atlas;
+        this.coordinateSystem = coordinateSystem;
+
         this.program = TextProgram.create(
                 (long) VERTEX_SIZE * BATCH_SIZE,
-                BATCH_SIZE
+                BATCH_SIZE,
+                coordinateSystem
         );
 
         GL40.glEnable(GL40.GL_BLEND);
@@ -75,15 +83,17 @@ public class TextRender {
             final float g,
             final float b
     ) {
+        final var scale = 1;
+        final var isDefaultCoordinateSystem = Objects.equals(this.coordinateSystem, CoordinateSystemEnum.TOP_LEFT);
         final var bottomL = xPos;
         final var topL = yPos;
-        final var bottomR = xPos + 1 * glyph.width;
-        final var topR = yPos + 1 * glyph.height;
+        final var bottomR = xPos + scale * glyph.width;
+        final var topR = yPos + scale * glyph.height;
 
-        final float textureBottomL = glyph.textureCoords[0].x;
-        final float textureTopL = glyph.textureCoords[0].y;
-        final float textureBottomR = glyph.textureCoords[1].x;
-        final float textureTopR = glyph.textureCoords[1].y;
+        final float textureU0 = glyph.textureCoords[0].x;
+        final float textureV0 = glyph.textureCoords[0].y;
+        final float textureU1 = glyph.textureCoords[1].x;
+        final float textureV1 = glyph.textureCoords[1].y;
 
         var index = size * VERTEX_SIZE;
         this.vertices[index] = bottomR;
@@ -93,8 +103,13 @@ public class TextRender {
         this.vertices[index + 3] = g;
         this.vertices[index + 4] = b;
 
-        this.vertices[index + 5] = textureBottomR;
-        this.vertices[index + 6] = textureTopL;
+        if(isDefaultCoordinateSystem) {
+            this.vertices[index + 5] = textureU1;
+            this.vertices[index + 6] = textureV1;
+        } else {
+            this.vertices[index + 5] = textureU1;
+            this.vertices[index + 6] = textureV0;
+        }
 
         index += 7;
         this.vertices[index] = bottomR;
@@ -104,8 +119,13 @@ public class TextRender {
         this.vertices[index + 3] = g;
         this.vertices[index + 4] = b;
 
-        this.vertices[index + 5] = textureBottomR;
-        this.vertices[index + 6] = textureTopR;
+        if(isDefaultCoordinateSystem) {
+            this.vertices[index + 5] = textureU1;
+            this.vertices[index + 6] = textureV0;
+        } else {
+            this.vertices[index + 5] = textureU1;
+            this.vertices[index + 6] = textureV1;
+        }
 
         index += 7;
         this.vertices[index] = bottomL;
@@ -115,8 +135,13 @@ public class TextRender {
         this.vertices[index + 3] = g;
         this.vertices[index + 4] = b;
 
-        this.vertices[index + 5] = textureBottomL;
-        this.vertices[index + 6] = textureTopR;
+        if(isDefaultCoordinateSystem) {
+            this.vertices[index + 5] = textureU0;
+            this.vertices[index + 6] = textureV0;
+        } else {
+            this.vertices[index + 5] = textureU0;
+            this.vertices[index + 6] = textureV1;
+        }
 
         index += 7;
         this.vertices[index] = bottomL;
@@ -126,8 +151,13 @@ public class TextRender {
         this.vertices[index + 3] = g;
         this.vertices[index + 4] = b;
 
-        this.vertices[index + 5] = textureBottomL;
-        this.vertices[index + 6] = textureTopL;
+        if(isDefaultCoordinateSystem) {
+            this.vertices[index + 5] = textureU0;
+            this.vertices[index + 6] = textureV1;
+        } else {
+            this.vertices[index + 5] = textureU0;
+            this.vertices[index + 6] = textureV0;
+        }
 
         size += 4;
     }
@@ -149,6 +179,18 @@ public class TextRender {
     public static TextRender create(
         final TextureAtlas atlas
     ) throws URISyntaxException {
-        return new TextRender(atlas);
+        return new TextRender(atlas, CoordinateSystemEnum.TOP_LEFT);
+    }
+
+    public static TextRender create(
+            final TextureAtlas atlas,
+            final CoordinateSystemEnum coordinateSystem
+    ) throws URISyntaxException {
+        return new TextRender(atlas, coordinateSystem);
+    }
+
+    public enum CoordinateSystemEnum {
+        BOTTOM_LEFT,
+        TOP_LEFT
     }
 }

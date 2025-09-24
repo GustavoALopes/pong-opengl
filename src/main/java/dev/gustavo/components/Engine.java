@@ -35,6 +35,7 @@ public class Engine {
         while (!Window.shouldClose()) {
             GL40.glClearColor(0, 0, 0, 1);
             GL40.glClear(GL40.GL_COLOR_BUFFER_BIT | GL40.GL_DEPTH_BUFFER_BIT);
+            Tick.update();
 
             this.renderer.render(this.scene);
 

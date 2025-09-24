@@ -3,6 +3,8 @@ package dev.gustavo.components.entities;
 import dev.gustavo.components.Window;
 import org.joml.Matrix4f;
 
+import java.util.function.Function;
+
 public class Ball extends Entity {
 
     private final Position position;
@@ -32,20 +34,14 @@ public class Ball extends Entity {
     }
 
     @Override
-    public void update(final long delta) {
+    public void update(final float delta) {
         if(position.y > Window.getHeight() || position.y < 0) {
             this.acceleration.y *= -1;
         }
 
         position.x += (float) (this.acceleration.x * 1.5);
         position.y += (float) (this.acceleration.y * 1.5);
-
-        if(position.x > Window.getWidth() || position.x < 0) {
-            this.reset();
-        }
-
 //        System.out.printf("Current ball position x: %s and y: %s\n", position.x, position.y);
-
 
         this.model
                 .identity()
@@ -53,7 +49,11 @@ public class Ball extends Entity {
                 .scale(100f, 100f, 1f);
     }
 
-    private void reset() {
+    public boolean isOverlapPaddles() {
+        return position.x > Window.getWidth() || position.x < 0;
+    }
+
+    public void reset() {
         this.position.x = Window.getWidth()/2;
         this.position.y = Window.getHeight()/2;
         this.acceleration.x *= -1;
@@ -72,6 +72,9 @@ public class Ball extends Entity {
         this.acceleration.x *= -1;
     }
 
+    public boolean isOverlapLeftPaddle() {
+        return this.position.x < 0;
+    }
 
     static class Position {
         protected float x;

@@ -34,12 +34,6 @@ public class Entity implements IEntity {
         return vbo;
     }
 
-    public static Entity create(
-            final float[] data
-    ) {
-        return new Entity(data);
-    }
-
     public FloatBuffer getData() {
         return this.data;
     }
@@ -50,7 +44,50 @@ public class Entity implements IEntity {
     }
 
     @Override
-    public void update(final long delta) {
+    public void update(final float delta) {
 
+    }
+
+    public static Entity create(
+            final float[] data
+    ) {
+        return new Entity(data);
+    }
+
+    public static class BoxCollision {
+        public final float minX, minY, maxX, maxY;
+
+        private BoxCollision(
+                final float minX,
+                final float minY,
+                final float maxX,
+                final float maxY
+        ) {
+            this.minX = minX;
+            this.minY = minY;
+            this.maxX = maxX;
+            this.maxY = maxY;
+        }
+
+        public static boolean overlap(BoxCollision a, BoxCollision b) {
+            return a.minX < b.maxX &&
+                    a.maxX > b.minX &&
+                    a.minY < b.maxY &&
+                    a.maxY > b.minX;
+        }
+
+        public static BoxCollision create(
+                final float minX,
+                final float minY,
+                final float maxX,
+                final float maxY
+        ) {
+            return new BoxCollision(
+                    minX,
+                    minY,
+                    maxX,
+                    maxY
+            );
+        }
     }
 }

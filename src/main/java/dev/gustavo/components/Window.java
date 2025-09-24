@@ -64,6 +64,8 @@ public class Window {
 
         GLFW.glfwShowWindow(id);
 
+        GLFW.glfwSwapInterval(1);
+
         Keyboard.bind();
     }
 

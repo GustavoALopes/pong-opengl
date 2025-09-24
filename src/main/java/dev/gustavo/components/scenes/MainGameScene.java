@@ -1,5 +1,6 @@
 package dev.gustavo.components.scenes;
 
+import dev.gustavo.components.Tick;
 import dev.gustavo.components.entities.Entity;
 import dev.gustavo.components.entities.EntityProgram;
 import dev.gustavo.components.Shader;
@@ -75,13 +76,29 @@ public class MainGameScene implements IScene {
     }
 
     private void update() {
-        this.leftPaddle.update(0);
-        this.rightPaddle.update(0);
-        this.leftPaddle.selfPlayer(this.ball);
-        this.ball.update(0);
+        this.leftPaddle.update(Tick.getDelta());
 
-        this.leftPaddle.checkCollision(this.ball);
-        this.rightPaddle.checkCollision(this.ball);
+        this.rightPaddle.selfPlayer(
+                Tick.getDelta(),
+                this.ball
+        );
+        this.rightPaddle.update(Tick.getDelta());
+
+        this.ball.update(Tick.getDelta());
+        if(this.leftPaddle.checkCollision(this.ball) || this.rightPaddle.checkCollision(this.ball)) {
+            this.ball.invertAcceleration();
+        }
+
+        if(this.ball.isOverlapPaddles()) {
+            if(this.ball.isOverlapLeftPaddle()) {
+                this.scores[1] += 1;
+            } else {
+                this.scores[0] += 1;
+            }
+
+            this.ball.reset();
+        }
+
     }
 
     public static MainGameScene create() throws URISyntaxException, IOException {
